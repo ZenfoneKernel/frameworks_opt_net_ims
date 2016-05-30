@@ -67,6 +67,7 @@ public class ImsManager {
     public static final int PROPERTY_DBG_VT_AVAIL_OVERRIDE_DEFAULT = 0;
     public static final String PROPERTY_DBG_WFC_AVAIL_OVERRIDE = "persist.dbg.wfc_avail_ovr";
     public static final int PROPERTY_DBG_WFC_AVAIL_OVERRIDE_DEFAULT = 0;
+    public static final String PROPERTY_VOLTE_CALL_CAPABLE = "net.lte.volte_call_capable";
 
     /**
      * For accessing the IMS related service.
@@ -258,6 +259,24 @@ public class ImsManager {
                 && isGbaValid(context);
     }
 
+    /**
+     * Indicates whether Volte call capable.
+     */
+    public static boolean isVolteCallCapable() {
+        boolean isVolteCallCapable = SystemProperties.getBoolean(PROPERTY_VOLTE_CALL_CAPABLE, false);
+        if (DBG) log("isVolteCallCapable: " + isVolteCallCapable);
+
+        return isVolteCallCapable;
+    }
+
+    /**
+     * Sets property to indicate whether Volte call is capable.
+     */
+    public static void setVolteCallCapability(boolean enabled) {
+        if (DBG) log("setVolteCallCapability: " + enabled);
+        SystemProperties.set(PROPERTY_VOLTE_CALL_CAPABLE, Boolean.toString(enabled));
+    }
+
     /*
      * Indicates whether VoLTE is provisioned on device
      */
@@ -339,8 +358,8 @@ public class ImsManager {
 
                 if (enabled) {
                     imsManager.turnOnIms();
-                } else if (context.getResources().getBoolean(
-                        com.android.internal.R.bool.imsServiceAllowTurnOff) && (
+                } else if (getBooleanCarrierConfig(context,
+                        CarrierConfigManager.KEY_CARRIER_ALLOW_TURNOFF_IMS_BOOL) && (
                         !isVolteEnabledByPlatform(context)
                         || !isEnhanced4gLteModeSettingEnabledByUser(context))) {
                     log("setVtSetting() : imsServiceAllowTurnOff -> turnOffIms");
